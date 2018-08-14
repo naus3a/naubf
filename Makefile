@@ -1,6 +1,6 @@
 all: naubf
 
-naubf: naubf.hpp naubf.cpp main.cpp
+naubf: naubf.hpp main.cpp
 	g++ main.cpp -o naubf
 
 clean: 
