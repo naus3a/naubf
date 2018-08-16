@@ -106,40 +106,7 @@ public:
             }
         }
     }
-
-
-    void parseSrc(std::string & _src){
-        for(int i=0;i<_src.size();i++){
-            switch(_src[i]){
-                case '<':
-                    pointerDown();
-                    break;
-                case '>':
-                    pointerUp();
-                    break;
-                case '+':
-                    valueUp();
-                    break;
-                case '-':
-                    valueDown();
-                    break;
-                case '.':
-                    output();
-                    break;
-                case ',':
-                    input();
-                    break;
-                case '[':
-                    open();
-                    break;
-                case ']':
-                    close();
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
+ 
 protected:
     void destroyTape(){
         if(tape != NULL){

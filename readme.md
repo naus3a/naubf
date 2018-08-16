@@ -10,3 +10,11 @@ Turns out that it was the perfect time frame for writing a *brainfuck* interpret
 * *extendable* because you get virtual function
 * *circular* because the tape is circular (i.e. if you move the pointer beyound the last cell, you find yourself on the first one)
 * just a toy, because it was written to kill time while waiting for a gorgeous *aglio olio e peperoncino*
+
+### How to build:
+`make`
+
+### How to use:
+* `naubf` will start an interactive interpreter
+* `naubf path/to/your/source.bf` will run a source code file
+* `naubf -h` will print the usual help screen, showing other options

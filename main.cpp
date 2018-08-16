@@ -2,7 +2,43 @@
 #include <fstream>
 #include <sstream>
 
+enum AvailableTypes{
+    TYPE_CHAR,
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_NONE
+};
+
+std::string typeNames[] = {
+    "char",
+    "int",
+    "float"
+};
+int nCells = 3000;
+AvailableTypes curType = TYPE_CHAR;
 bool bVerbose = false;
+
+template<typename T>
+void parseFile(std::string & _src){
+    Naubf<T> naubf(nCells);
+    naubf.parseSrc(_src, false);
+}
+
+void parseFile(std::string & _src, AvailableTypes _curType){
+    switch(_curType){
+        case TYPE_CHAR:
+            parseFile<char>(_src);
+            break;
+        case TYPE_INT:
+            parseFile<int>(_src);
+            break;
+        case TYPE_FLOAT:
+            parseFile<float>(_src);
+            break;
+        default:
+            break;
+    }
+}
 
 void parseFile(char * _pth){
     std::ifstream f(_pth);
@@ -10,27 +46,49 @@ void parseFile(char * _pth){
     std::string src;
     buf<<f.rdbuf();
     src = buf.str();
-    Naubf<char> naubf;
+    parseFile(src, curType);
+    Naubf<char> naubf(nCells);
     naubf.parseSrc(src, false);
 }
 
 template<typename T>
 void prompt(Naubf<T> & _bf){
     std::string s;
-    std::cout<<"[naubf:]";
+    std::cout<<"[naubf]:: ";
     std::cin >> s;
     
     _bf.parseSrc(s, bVerbose);
 }
 
+template<typename T>
+void startInteractive(){
+    Naubf<T> naubf(nCells);
+    while(1){
+        prompt<T>(naubf);
+    }
+}
+
 void startInteractive(){
     std::cout<<"-Interactive interpreter mode-"<<std::endl;
+    std::cout<<"    - tape size: "<<nCells<<std::endl;
+    std::cout<<"    - cell type: "<<typeNames[(int)curType]<<std::endl;
     std::cout<<"[new line to run current line]"<<std::endl;
     std::cout<<"[ctrl-c to exit              ]"<<std::endl;
-    Naubf<char> naubf;
-    while(1){
-        prompt<char>(naubf);
+    
+    switch(curType){
+        case TYPE_CHAR:
+            startInteractive<char>();
+            break;
+        case TYPE_INT:
+            startInteractive<int>();
+            break;
+        case TYPE_FLOAT:
+            startInteractive<float>();
+            break;
+        default:
+            break;
     }
+
 }
 
 void printWelcome(){
@@ -61,7 +119,17 @@ bool isOption(std::string & _s){
     return false;
 }
 
+void parseTypeArgument(std::string _s){
+    for(int i=0;i<(int)TYPE_NONE;i++){
+        if(_s==typeNames[i]){
+            curType = (AvailableTypes)i;
+            return;
+        }
+    }
+}
+
 void parseArguments(int argc, char * argv[]){
+    
     for(int i=1;i<argc;i++){
         std::string _arg(argv[i]);
         if(isOption(_arg)){
@@ -71,7 +139,6 @@ void parseArguments(int argc, char * argv[]){
                     break;
                 case 'v':
                     bVerbose = true;
-                    startInteractive();
                     break;
                 case 'f':
                     if(i<(argc-1)){
@@ -79,14 +146,28 @@ void parseArguments(int argc, char * argv[]){
                     }
                     return;
                     break;
+                case 's': 
+                    if(i<(argc-1)){
+                        nCells = atoi(argv[i+1]);
+                        i++;
+                    }
+                    break;
+                case 't':
+                    if(i<(argc-1)){
+                        parseTypeArgument(std::string(argv[i+1]));
+                        i++;
+                    }
+                    break;
                 default:
                     printHelp();
                     break;
             }
         }else{
-            printHelp();
+            parseFile(argv[i]);
+            return;
         }
     }
+    startInteractive();
 }
 
 int main(int argc, char * argv[]){
